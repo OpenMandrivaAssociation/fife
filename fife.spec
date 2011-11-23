@@ -23,6 +23,7 @@ Patch0:		%{name}-0.3.2-soname.patch
 Patch2:		%{name}-0.3.2r2-svn3592-boost-fix.patch
 # This should probably be fixed in swig.
 Patch3:		%{name}-0.3.2r2-gcc46.patch
+Patch4:		%{name}-0.3.2-linking.patch
 BuildRequires:	scons
 BuildRequires:	SDL-devel
 BuildRequires:	boost-devel
@@ -121,6 +122,8 @@ sed -i "s|SONAME|%{soname}|g" \
 
 # Fix swig generated file to work with gcc 4.6
 %patch3 -p1
+
+%patch4 -p1 -b .linking
 
 %build
 scons . \
