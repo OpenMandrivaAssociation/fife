@@ -1,14 +1,14 @@
 %define soname 0
 %define libname %mklibname %{name} %{soname}
-%define develname %mklibname -d %{name}
+%define devname %mklibname -d %{name}
 %define staticname %mklibname -d -s %{name}
 # fife.ppc: W: devel-file-in-non-devel-package /usr/lib/libfife.so <- just a symlink, shouldn't be in -devel. It's used by the client(s).
 %global minor_version r2
 
+Summary:	Cross platform game creation framework
 Name:		fife
 Version:	0.3.2
-Release:	%mkrel 1
-Summary:	Cross platform game creation framework
+Release:	2
 Group:		System/Libraries
 License:	LGPLv2+
 URL:		http://www.fifengine.de
@@ -24,22 +24,24 @@ Patch2:		%{name}-0.3.2r2-svn3592-boost-fix.patch
 # This should probably be fixed in swig.
 Patch3:		%{name}-0.3.2r2-gcc46.patch
 Patch4:		%{name}-0.3.2-linking.patch
+
+BuildRequires:	chrpath
 BuildRequires:	scons
+BuildRequires:	graphviz
+BuildRequires:	swig
 BuildRequires:	SDL-devel
 BuildRequires:	boost-devel
 BuildRequires:	SDL_ttf-devel
 BuildRequires:	SDL_image-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	openal-devel
-BuildRequires:	swig
 BuildRequires:	python-devel
 BuildRequires:	zlib-devel
 BuildRequires:	mesaglu-devel
 BuildRequires:	guichan-devel
 BuildRequires:	libpng-devel
-BuildRequires:	graphviz
 BuildRequires:	libxcursor-devel
-BuildRequires:	chrpath
+
 Provides:	%{name}-python = %{version}-%{release}
 Requires:	%{libname} = %{version}-%{release}
 
@@ -55,20 +57,20 @@ Requires:	%{name} = %{version}-%{release}
 %description -n %{libname}
 Shared libs for %{name}.
 
-%package -n %develname
+%package -n %devname
 Summary:	Development package for %{name}
 Group:		Development/C
 Requires:	%{libname} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	%{name}-devel < %{version}-%{release}
 
-%description -n %{develname}
+%description -n %{devname}
 Files for development with %{name}.
 
 %package -n %{staticname}
 Summary:	Static library for %{name} development
 Group:		Development/C
-Requires:	%{develname} = %{version}-%{release}
+Requires:	%{devname} = %{version}-%{release}
 Provides:	%{name}-static-devel = %{version}-%{release}
 Obsoletes:	%{name}-static < %{version}-%{release}
 
@@ -127,28 +129,25 @@ sed -i "s|SONAME|%{soname}|g" \
 
 %build
 scons . \
-      CXXFLAGS='%{optflags}' \
-      --enable-debug \
-      --enable-rend-grid \
-      --enable-rend-camzone \
-              fife-shared fife-static fife-python fife-swig
+	CXXFLAGS='%{optflags}' \
+	--enable-debug \
+	--enable-rend-grid \
+	--enable-rend-camzone \
+	fife-shared fife-static fife-python fife-swig
 
 # Doxygen generated docs
 doxygen ./doc/doxygen/doxyfile
 rm -f ./doc/doxygen/html/installdox
 
-
 %install
-rm -rf %{buildroot}
-
 scons . \
-      CXXFLAGS='%{optflags}' \
-      --enable-debug \
-              install-all \
-              install-dev \
-                     DESTDIR=%{buildroot} \
-                            --prefix=%{_prefix} \
-                            --python-prefix=%{python_sitearch}
+	CXXFLAGS='%{optflags}' \
+	--enable-debug \
+		install-all \
+		install-dev \
+	DESTDIR=%{buildroot} \
+	--prefix=%{_prefix} \
+	--python-prefix=%{python_sitearch}
 
 # rpath is evil, evil, evil
 chrpath --delete %{buildroot}%{_libdir}/lib%{name}.so
@@ -174,7 +173,6 @@ chmod 755 %{buildroot}/%{_libdir}/lib%{name}.so.%{soname}
 chmod 755 %{buildroot}/%{python_sitearch}/%{name}/_%{name}.so
 
 %files
-%defattr(-,root,root,-)
 %doc AUTHORS CHANGES COPYING README
 %{python_sitearch}/%{name}
 
@@ -182,17 +180,14 @@ chmod 755 %{buildroot}/%{python_sitearch}/%{name}/_%{name}.so
 %{_libdir}/lib%{name}.so.%{soname}
 %{_libdir}/lib%{name}.so.%{version}
 
-%files -n %{develname}
-%defattr(-,root,root,-)
+%files -n %{devname}
 %{_libdir}/lib%{name}.so
 %{_includedir}/%{name}/
 
 %files -n %{staticname}
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}.a
 
 %files doc
-%defattr(-,root,root,-)
 %doc ./doc/doxygen/html/*
 %{_bindir}/%{name}-documentation
 
