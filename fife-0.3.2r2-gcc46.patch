@@ -1,0 +1,11 @@
+diff -up fife-0.3.2r2/engine/swigwrappers/python/fife.i.templ.gcc46 fife-0.3.2r2/engine/swigwrappers/python/fife.i.templ
+--- fife-0.3.2r2/engine/swigwrappers/python/fife.i.templ.gcc46	2011-04-18 15:56:01.973524289 -0400
++++ fife-0.3.2r2/engine/swigwrappers/python/fife.i.templ	2011-04-18 15:56:27.419223593 -0400
+@@ -1,4 +1,7 @@
+ %module(directors="1") fife
++%{
++#include <cstddef>
++%}
+ %include "std_string.i"
+ %include "std_vector.i"
+ %include "std_pair.i"
