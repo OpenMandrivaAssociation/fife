@@ -3,12 +3,12 @@
 %define devname %mklibname -d %{name}
 %define staticname %mklibname -d -s %{name}
 # fife.ppc: W: devel-file-in-non-devel-package /usr/lib/libfife.so <- just a symlink, shouldn't be in -devel. It's used by the client(s).
-%global minor_version r2
+%global minor_version r3
 
 Summary:	Cross platform game creation framework
 Name:		fife
-Version:	0.3.2
-Release:	2
+Version:	0.3.3
+Release:	1
 Group:		System/Libraries
 License:	LGPLv2+
 URL:		http://www.fifengine.de
@@ -16,31 +16,24 @@ URL:		http://www.fifengine.de
 # removed ext/   -  removed for using system libs instead of shipped
 # removed tests/   -  removed for legal issues
 # removed tools/   -  removed for legal issues
-Source0:	%{name}-%{version}%{?minor_version}.tar.gz
-Patch0:		%{name}-0.3.2-soname.patch
-# Fix the VFSDirectory code to work with known versions of boost
-# SVN 3592
-Patch2:		%{name}-0.3.2r2-svn3592-boost-fix.patch
-# This should probably be fixed in swig.
-Patch3:		%{name}-0.3.2r2-gcc46.patch
-Patch4:		%{name}-0.3.2-linking.patch
-
+Source0:	%{name}-%{version}%{?minor_version}.tar.xz
 BuildRequires:	chrpath
 BuildRequires:	scons
 BuildRequires:	graphviz
 BuildRequires:	swig
-BuildRequires:	SDL-devel
 BuildRequires:	boost-devel
-BuildRequires:	SDL_ttf-devel
-BuildRequires:	SDL_image-devel
-BuildRequires:	libvorbis-devel
-BuildRequires:	openal-devel
 BuildRequires:	python-devel
+BuildRequires:	SDL_ttf-devel
+BuildRequires:	tinyxml-devel
 BuildRequires:	zlib-devel
-BuildRequires:	mesaglu-devel
-BuildRequires:	guichan-devel
-BuildRequires:	libpng-devel
-BuildRequires:	libxcursor-devel
+BuildRequires:	pkgconfig(glu)
+BuildRequires:	pkgconfig(guichan-0.8)
+BuildRequires:	pkgconfig(libpng)
+BuildRequires:	pkgconfig(openal)
+BuildRequires:	pkgconfig(sdl)
+BuildRequires:	pkgconfig(SDL_image)
+BuildRequires:	pkgconfig(vorbis)
+BuildRequires:	pkgconfig(xcursor)
 
 Provides:	%{name}-python = %{version}-%{release}
 Requires:	%{libname} = %{version}-%{release}
@@ -57,7 +50,7 @@ Requires:	%{name} = %{version}-%{release}
 %description -n %{libname}
 Shared libs for %{name}.
 
-%package -n %devname
+%package -n %{devname}
 Summary:	Development package for %{name}
 Group:		Development/C
 Requires:	%{libname} = %{version}-%{release}
@@ -114,19 +107,6 @@ done
 sed -i 's|i->leaf()|i->path().leaf()|g' \
     engine/core/vfs/vfsdirectory.cpp
 
-# no soname? You can not be serious!
-%patch0 -p1
-sed -i "s|SONAME|%{soname}|g" \
-    engine/SConscript
-
-# Fix boost compile
-%patch2 -p1
-
-# Fix swig generated file to work with gcc 4.6
-%patch3 -p1
-
-%patch4 -p1 -b .linking
-
 %build
 scons . \
 	CXXFLAGS='%{optflags}' \
@@ -147,14 +127,14 @@ scons . \
 		install-dev \
 	DESTDIR=%{buildroot} \
 	--prefix=%{_prefix} \
+	--lib-dir=%{_lib} \
 	--python-prefix=%{python_sitearch}
 
 # rpath is evil, evil, evil
-chrpath --delete %{buildroot}%{_libdir}/lib%{name}.so
+chrpath --delete %{buildroot}%{_libdir}/lib%{name}.so.%{version}
 chrpath --delete %{buildroot}%{python_sitearch}/%{name}/_%{name}.so
 
 # playing a little bit with soname
-mv %{buildroot}/%{_libdir}/lib%{name}.so %{buildroot}/%{_libdir}/lib%{name}.so.%{version}
 pushd %{buildroot}%{_libdir}
 ln -s lib%{name}.so.%{version} lib%{name}.so.%{soname}
 ln -s lib%{name}.so.%{version} lib%{name}.so
@@ -190,4 +170,5 @@ chmod 755 %{buildroot}/%{python_sitearch}/%{name}/_%{name}.so
 %files doc
 %doc ./doc/doxygen/html/*
 %{_bindir}/%{name}-documentation
+
 
