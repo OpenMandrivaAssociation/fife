@@ -3,20 +3,21 @@
 %define devname %mklibname -d %{name}
 %define staticname %mklibname -d -s %{name}
 # fife.ppc: W: devel-file-in-non-devel-package /usr/lib/libfife.so <- just a symlink, shouldn't be in -devel. It's used by the client(s).
-%global minor_version r3
+#global minor_version r3
 
 Summary:	Cross platform game creation framework
 Name:		fife
-Version:	0.3.3
+Version:	0.3.4
 Release:	1
 Group:		System/Libraries
 License:	LGPLv2+
 URL:		http://www.fifengine.de
-# https://sourceforge.net/projects/fife/files/active/src/fife-0.3.2.tar.gz/download
+# https://sourceforge.net/projects/fife/files/active/src/fife_%{version}.tar.gz/download
 # removed ext/   -  removed for using system libs instead of shipped
 # removed tests/   -  removed for legal issues
-# removed tools/   -  removed for legal issues
-Source0:	%{name}-%{version}%{?minor_version}.tar.xz
+# added docs/   -  missing in 0.3.4 by mistake?
+Source0:	%{name}_%{version}%{?minor_version}.tar.xz
+Patch0:		fife-0.3.4-no-tests.patch
 BuildRequires:	chrpath
 BuildRequires:	scons
 BuildRequires:	graphviz
@@ -25,7 +26,6 @@ BuildRequires:	boost-devel
 BuildRequires:	python-devel
 BuildRequires:	SDL_ttf-devel
 BuildRequires:	tinyxml-devel
-BuildRequires:	zlib-devel
 BuildRequires:	pkgconfig(glu)
 BuildRequires:	pkgconfig(guichan-0.8)
 BuildRequires:	pkgconfig(libpng)
@@ -34,6 +34,7 @@ BuildRequires:	pkgconfig(sdl)
 BuildRequires:	pkgconfig(SDL_image)
 BuildRequires:	pkgconfig(vorbis)
 BuildRequires:	pkgconfig(xcursor)
+BuildRequires:	pkgconfig(zlib)
 
 Provides:	%{name}-python = %{version}-%{release}
 Requires:	%{libname} = %{version}-%{release}
@@ -79,10 +80,11 @@ BuildArch:	noarch
 Requires:	%{name} = %{version}-%{release}
 
 %description doc
-Doxygen generated documentation for %{name}. 
+Doxygen generated documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}%{?minor_version}
+%setup -q -n %{name}_%{version}%{?minor_version}
+%patch0 -p1
 
 # remove usage of ./ext/ (see line 16 for further informations)
 # very dirrty, but it works
@@ -101,7 +103,7 @@ do
  iconv -f iso-8859-1 -t utf-8 $f |sed 's|\r||g' > $f.utf8
  touch -c -r $f $f.utf8
  mv $f.utf8 $f
-done 
+done
 
 # correction of leaf
 sed -i 's|i->leaf()|i->path().leaf()|g' \

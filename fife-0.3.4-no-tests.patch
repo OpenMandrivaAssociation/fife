@@ -1,0 +1,13 @@
+diff -urN fife_0.3.4/SConstruct fife_0.3.4-patched/SConstruct
+--- fife_0.3.4/SConstruct	2012-10-30 02:31:18.000000000 +1100
++++ fife_0.3.4-patched/SConstruct	2013-03-13 22:03:20.863109421 +1100
+@@ -392,9 +392,6 @@
+ #build the engine
+ env.SConscript('engine/SConscript', variant_dir=engine_var_dir, duplicate=0, exports='opts')
+ 
+-#build the engine tests
+-env.SConscript('tests/core_tests/SConscript', variant_dir=tests_var_dir, duplicate=0, exports='opts')
+-
+ #build the external dependencies
+ env.SConscript('ext/SConscript')
+ 
