@@ -8,7 +8,7 @@
 Summary:	Cross platform game creation framework
 Name:		fife
 Version:	0.3.4
-Release:	1
+Release:	2
 Group:		System/Libraries
 License:	LGPLv2+
 URL:		http://www.fifengine.de
