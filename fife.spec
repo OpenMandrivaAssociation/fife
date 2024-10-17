@@ -11,7 +11,7 @@ Version:	0.3.4
 Release:	2
 Group:		System/Libraries
 License:	LGPLv2+
-URL:		http://www.fifengine.de
+URL:		https://www.fifengine.de
 # https://sourceforge.net/projects/fife/files/active/src/fife_%{version}.tar.gz/download
 # removed ext/   -  removed for using system libs instead of shipped
 # removed tests/   -  removed for legal issues
